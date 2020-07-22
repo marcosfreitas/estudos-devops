@@ -1,0 +1,59 @@
+# main files to serve
+index index.php index.html;
+
+location / {
+
+    allow all;
+
+    # First attempt to serve request as file, then
+    # as directory, then fall back to displaying a 404.
+    #try_files $uri $uri/ =404;
+    try_files $uri $uri/ /index.php?$query_string;
+
+    # Set CSP Rules
+    # https://content-security-policy.com/
+    # ajusta o conjunto de domínios permitidos para carregamento de scripts externos
+    # aplica os métodos aceitos para aplicar estilos e executar scripts no site
+    # add_header Content-Security-Policy default-src 'self' data: 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.gstatic.com *google-analytics.com
+
+}
+
+# pass PHP scripts to FastCGI server
+
+include conf.d/snippets/php.conf;
+
+# if the laravel project is located into a subdirectory
+
+#   location ^~ /app {
+#       alias /var/www/PATH_TO_SUBDIRECTORY/www/public;
+#       try_files $uri $uri/ @sub_directory;
+
+#       location ~ \.php$ {
+#           include conf.d/snippets/fastcgi-php.conf;
+#           fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+#       }
+#   }
+
+#   location @sub_directory {
+#       rewrite /app/(.*)$ /app/index.php?/$1 last;
+#   }
+# --
+
+# deny access to .htaccess files, if Apache's document root
+# concurs with nginx's one
+
+location ~ /\.ht {
+    deny all;
+}
+
+# disallow the access to all files and folders with dot at the beginning
+location ~ /\.(?!well-known\/) {
+    deny all;
+}
+
+# blocks old WordPress xmlrpc feature to prevent authentication attacks in this file
+location = /xmlrpc.php {
+    deny all;
+    access_log off;
+    log_not_found off;
+}

@@ -1,0 +1,6 @@
+# @author Marcos Freitas
+
+# the following configuration snippet implements a 1‑second caching period for responses with a 200 OK status code.
+fastcgi_cache_path /tmp/cache keys_zone=APPLICATION:10m levels=1:2 inactive=60m max_size=500m use_temp_path=off;
+
+include conf.d/snippets/http-server.conf;

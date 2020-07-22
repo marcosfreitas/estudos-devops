@@ -1,0 +1,16 @@
+# @info part of http block at nginx.conf
+
+# https://medium.freecodecamp.org/nginx-rate-limiting-in-a-nutshell-128fe9e0126c
+limit_req_zone $binary_remote_addr zone=generic:10m rate=10r/s;
+# @todo need review
+#limit_req zone=generic burst=20 nodelay;
+
+# Control maximum number of simultaneous connections for one session i.e.
+# restricts the amount of connections from a single ip address
+# @todo @experimental limit_conn addr 10;
+
+# these configurations affects the log records
+proxy_set_header Host $http_host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
