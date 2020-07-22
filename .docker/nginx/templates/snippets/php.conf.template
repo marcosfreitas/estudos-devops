@@ -1,0 +1,12 @@
+# cache-directives.conf already have bypasses
+
+location ~ \.php$ {
+    #include conf.d/snippets/fastcgi-php.conf;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+    include conf.d/snippets/fastcgi-extra-php-params.conf;
+
+    # With php-fpm (or other unix sockets):
+    fastcgi_pass php_upstream;
+}
