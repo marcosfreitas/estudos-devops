@@ -6,8 +6,7 @@ EXPOSE 9000
 
 # @info fix permissions
 # Use the default production configuration
-RUN echo ${APP_ENVIROMENT} &&\
-    apk update && apk add --no-cache shadow bash composer &&\
+RUN apk update && apk add --no-cache shadow bash composer &&\
     usermod -u 1000 www-data &&\
     mv "$PHP_INI_DIR/php.ini-$APP_ENVIROMENT" "$PHP_INI_DIR/php.ini" &&\
     docker-php-ext-install mysqli pdo_mysql &&\

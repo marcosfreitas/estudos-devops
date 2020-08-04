@@ -25,7 +25,7 @@ services:
     depends_on:
       - php
       - database
-    #command: ["./wait-for-it.sh", "database:3306", "-- echo 'database ready'"]
+    command: bash -c "dockerize -wait tcp://database:3306 -wait tcp://php:9000 -timeout 300s -wait-retry-interval 30s"
 
   php:
     build:
