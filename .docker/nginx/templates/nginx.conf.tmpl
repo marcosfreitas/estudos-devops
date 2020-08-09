@@ -1,0 +1,230 @@
+# @author Marcos Freitas
+# @version 2.0.0
+
+# worker_processes shoult be the same as the number of cores of the processor
+# worker_connection can be multiplied by worker_processes to improve performance
+# Check out Nginx' documentation for more details.
+
+user nginx;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+
+# number of file descriptors used for nginx
+# the limit for the maximum FDs on the server is usually set by the OS.
+# if you don't set FD's then OS settings will be used which is by default 2000
+worker_rlimit_nofile 50000;
+
+events {
+       # determines how much clients will be served per worker
+       # max clients = worker_connections * worker_processes
+       # max clients is also limited by the number of socket connections available on the system (~64k)
+        worker_connections 20000;
+
+       # optimized to serve many clients with each thread, essential for linux -- for testing environment
+       # use epoll;
+
+       # accept as many connections as possible, may flood worker connections if set too low -- for testing environment
+       # multi_accept on;
+}
+
+http {
+
+	##
+	# Basic Settings
+	##
+
+    # enabled for small downloads only into performance snippet
+	sendfile off;
+    tcp_nopush on;
+	tcp_nodelay on;
+	types_hash_max_size 2048;
+
+	# https://medium.freecodecamp.org/nginx-rate-limiting-in-a-nutshell-128fe9e0126c
+    limit_req_zone $binary_remote_addr zone=generic:10m rate=10r/s;
+    # @todo need review
+    #limit_req zone=generic burst=20 nodelay;
+
+    # Control maximum number of simultaneous connections for one session i.e.
+    # restricts the amount of connections from a single ip address
+    # @todo @experimental limit_conn addr 10;
+
+    # these configurations affects the log records
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+	# @todo server_names_hash_bucket_size 64;
+	# @todo server_name_in_redirect off;
+
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+
+	##
+	# Logging Settings
+	##
+
+	log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+	access_log /var/log/nginx/access.log main;
+	error_log /var/log/nginx/error.log;
+
+	##
+	# Virtual Host Configs
+	##
+
+    # the following configuration snippet implements a 1‑second caching period for responses with a 200 OK status code.
+    fastcgi_cache_path /tmp/cache keys_zone=APPLICATION:10m levels=1:2 inactive=60m max_size=500m use_temp_path=off;
+
+	# @info default http:80 server
+
+    server {
+        listen {{ .Env.NGINX_PORT }} default_server;
+        listen [::]:{{ .Env.NGINX_PORT }} default_server;
+
+        #listen 80 default_server;
+        #listen [::]:80 default_server;
+
+        root {{ .Env.NGINX_ROOT }};
+        #root /var/www/html/public;
+
+        server_name {{ .Env.NGINX_HOST }};
+        #server_name localhost;
+
+        # to SSL permanent redirect for all request on port 80
+        #server_name _;
+        #return 301 https://$host$request_uri;
+
+        # load general security configurations
+        # @info part of server block
+        # @todo change the name of this file
+
+        # Disable show nginx version
+        server_tokens off;
+
+        # removing php header
+        fastcgi_hide_header X-Powered-By;
+
+        # Avoid clickjacking
+        add_header X-Frame-Options SAMEORIGIN;
+
+        # Disable content-type sniffing on some browsers
+        add_header X-Content-Type-Options nosniff;
+
+        # Enable the Cross-site scripting (XSS) filter
+        add_header X-XSS-Protection "1; mode=block";
+
+        # Disable directory listing
+        autoindex off;
+
+        # Set cookies secure
+        #set_cookie_flag HttpOnly secure;
+
+        # Enable CORS
+        add_header Access-Control-Allow-Origin '*';
+
+        # By removing the ETag header, you disable caches and browsers from being able to validate files,
+        # so they are forced to rely on your Cache-Control and Expires header.
+        # Basically you can remove If-Modified-Since and If-None-Match requests and their 304 Not Modified Responses.
+        etag off;
+
+        # Performance configuration
+        set $skip_cache 0;
+
+        # POST requests and urls with a query string should always go to PHP
+        if ($request_method = POST) {
+            set $skip_cache 1;
+        }
+        if ($query_string != "") {
+            set $skip_cache 1;
+        }
+
+        # Wordpress Cache configuration
+
+
+        # Don't cache uris containing the following segments
+        if ($request_uri ~* "/wp-admin/|/xmlrpc.php|wp-.*.php|/feed/|index.php|sitemap(_index)?.xml") {
+            set $skip_cache 1;
+        }
+
+        # Don't use the cache for logged in users or recent commenters
+        if ($http_cookie ~* "comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in") {
+            set $skip_cache 1;
+        }
+
+        # "punching a hole" through the cache
+        # To support Pragma: no-cache sent by clients and force touch the resource without cache
+        # and Acessible as http://www.example.com/?nocache=true
+        fastcgi_cache_bypass $skip_cache $http_pragma $cookie_nocache $arg_nocache;
+        fastcgi_no_cache $skip_cache;
+
+        # https://www.nginx.com/blog/nginx-caching-guide/#proxy_cache_path
+        add_header X-Cache-Status $upstream_cache_status;
+
+        # @info using predefined keys_zone at app.conf
+        fastcgi_cache APPLICATION;
+
+        fastcgi_cache_revalidate on;
+
+        # 200 301 302 statuses are cached by 1 minute
+        fastcgi_cache_valid 1m;
+        # 404 status
+        fastcgi_cache_valid 404 5s;
+
+        # delivering Cached Content When the Origin is Down
+        fastcgi_cache_use_stale error timeout invalid_header updating http_500 http_503;
+        fastcgi_cache_background_update on;
+
+        # only one request at a time will be allowed to populate a new cache element
+        fastcgi_cache_key "$scheme$request_method$host$request_uri";
+        fastcgi_cache_lock on;
+
+        # add header to show if the response is cached
+        add_header rt-Fastcgi-Cache $upstream_cache_status;
+
+        #include conf.d/snippets/performance.conf;
+
+        # base configurations of virtual host
+        # main files to serve
+        index index.php index.html;
+
+        location / {
+
+            allow all;
+
+            # First attempt to serve request as file, then
+            # as directory, then fall back to displaying a 404.
+            #try_files $uri $uri/ =404;
+            try_files $uri $uri/ /index.php?$query_string;
+
+            # Set CSP Rules
+            # https://content-security-policy.com/
+            # ajusta o conjunto de domínios permitidos para carregamento de scripts externos
+            # aplica os métodos aceitos para aplicar estilos e executar scripts no site
+            # add_header Content-Security-Policy default-src 'self' data: 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.gstatic.com *google-analytics.com
+
+        }
+
+        # pass PHP scripts to FastCGI server
+        location ~ \.php$ {
+            #include conf.d/snippets/fastcgi-php.conf;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+            # @changelog
+            # increased memory_limit directive
+            fastcgi_param PHP_VALUE "memory_limit=512M;\n allow_url_fopen=on;\n file_uploads=on;\n upload_tmp_dir=\"/tmp\";\n upload_max_filesize=80M;\n post_max_size=80M;\n max_execution_time=600;\n max_input_time=600;\n session.cookie_httponly=on;\n display_startup_errors=off;\n display_errors=off;\n html_errors=off;\n error_reporting=on;\n log_errors=on;\n error_log=\"/var/log/nginx/php_error.log\";";
+
+            # With php-fpm (or other unix sockets):
+            fastcgi_pass {{ .Env.PHP_HOST }}:{{ .Env.PHP_PORT }};
+
+            #fastcgi_pass php:9000;
+        }
+    }
+
+    # @bug failed permissions
+	#include /etc/nginx/sites-enabled/*;
+}

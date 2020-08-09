@@ -19,11 +19,13 @@ EXPOSE 443
 #    wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&\
 #    chmod +x wait-for-it.sh
 
-RUN rm /etc/nginx/nginx.conf
-RUN rm /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/nginx.conf && rm /etc/nginx/conf.d/default.conf && ls /etc/nginx/conf.d/
 
 # From the context of this Dockerfile
-ADD /nginx/nginx.conf /etc/nginx/nginx.conf
+# moved with .tmpl suffix because dockerize
+# @todo change it back, because I won't use this functionality of dockerize
+ADD /nginx/templates/nginx.conf.tmpl /etc/nginx/nginx.conf.tmpl
+#ADD /nginx/templates/nginx.conf.tmpl /etc/nginx/nginx.conf
 
 # Installing dockerize
 RUN apk update && apk add --no-cache openssl shadow bash
@@ -46,4 +48,4 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERS
 #VOLUME /../../www /var/www/html
 #VOLUME /../../.docker/nginx/templates /etc/nginx/templates
 
-CMD ["nginx-debug", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
