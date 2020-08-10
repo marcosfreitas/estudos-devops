@@ -1,4 +1,4 @@
-# Laravel Host em docker - para testes
+# Laravel Host em docker com dockerize implementado - para testes
 
 Este projeto está equipado com docker-compose, ao clonar você pode executar desta forma:
 
@@ -6,7 +6,7 @@ Este projeto está equipado com docker-compose, ao clonar você pode executar de
 
 A imagem construída do projeto Laravel foi publicada no Docker HUB:
 
-https://hub.docker.com/repository/docker/marcosfreitas/devops-laravel-project
+https://hub.docker.com/r/marcosfreitas/codeeducation/
 
 # Detalhes dos Containeres
 
@@ -23,4 +23,6 @@ Também estão presentes estes dois serviços sem modificações. O MySQL possui
 
 ## Detalhes
 
-Na raiz do repositório há o arquivo .env que define o nome do projeto que reflete nas configurações do Laravel, prefixo de containeres e nome de Banco de dados, além do ambiente (development ou production) para o php-fpm
+Na raiz do repositório há o arquivo .env que define o nome do projeto que reflete nas configurações do Laravel, prefixo de containeres e nome de Banco de dados, além do ambiente (development ou production) para o php-fpm.
+
+O arquivo docker-compose.yml implementa outras variáveis de ambiente utilizadas pelo dockerize.
