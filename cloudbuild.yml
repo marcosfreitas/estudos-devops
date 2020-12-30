@@ -14,16 +14,16 @@ steps:
 
 - id: "Ajuste de permissão da pasta 1"
   name: "gcr.io/cloud-builders/docker"
-  args: ["exec", "-t", "dlh_php_1", "sudo", "chmod", "-R", "775", "/var/www/html"]
+  args: ["exec", "-t", "dlh_php_1", "/bin/bash", "sudo", "chmod", "-R", "775", "/var/www/html"]
 
 - id: "Ajuste de permissão da pasta 2"
   name: "gcr.io/cloud-builders/docker"
-  args: ["exec", "-t", "dlh_php_1", "sudo", "chown", "-R", "$USER:$USER", "/var/www/html"]
+  args: ["exec", "-t", "dlh_php_1", "/bin/bash", "sudo", "chown", "-R", "$USER:$USER", "/var/www/html"]
 
 - id: "Rodando composer"
   name: "gcr.io/cloud-builders/docker"
-  args: ['exec', '-t', 'dlh_php_1', 'composer', 'install']
+  args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'composer', 'install']
 
 - id: "Rodando key:generate"
   name: "gcr.io/cloud-builders/docker"
-  args: ['exec', '-t', 'dlh_php_1', 'php' , '/var/www/html/artisan', 'key:generate']
+  args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'php' , '/var/www/html/artisan', 'key:generate']
