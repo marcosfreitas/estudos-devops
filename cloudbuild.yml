@@ -10,7 +10,7 @@ steps:
 
 - id: "Ajuste de permissão da pasta 2"
   name: "bash"
-  args: ["chown", "-R", "$USER:$USER", "./www"]
+  args: ["chown", "-R", "root:root", "./www"]
 
 - id: "Rodando docker-compose"
   name: "gcr.io/$PROJECT_ID/docker-compose"
