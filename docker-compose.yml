@@ -7,7 +7,7 @@ services:
       context: .docker/
       dockerfile: nginx/Dockerfile
     tty: true
-    restart: always
+    restart: unless-stopped
     networks:
       - backend
       - database
@@ -17,15 +17,17 @@ services:
     volumes:
       - ./www:/var/www/html
       - ./.docker/nginx/templates:/etc/nginx/templates
-    environment:
-      - NGINX_HOST=localhost
-      - NGINX_PORT=80
-      - PHP_HOST=php
-      - PHP_PORT=9000
+    #environment:
+    #  - NGINX_ROOT=/var/www/html/public
+    #  - NGINX_HOST=localhost
+    #  - NGINX_PORT=80
+    #  - PHP_HOST=php
+    #  - PHP_PORT=9000
     depends_on:
       - php
       - database
-    #command: ["./wait-for-it.sh", "database:3306", "-- echo 'database ready'"]
+    #-stdout /var/log/nginx/acess.log -stdout /var/log/nginx/error.log -template /etc/nginx/nginx.conf.tmpl:/etc/nginx/nginx.conf
+    #command: bash -c 'dockerize -template /etc/nginx/nginx.conf.tmpl:/etc/nginx/nginx.conf -wait tcp://database:3306 -wait tcp://php:9000 -timeout 60s -wait-retry-interval 10s nginx -g "daemon off;"'
 
   php:
     build:
