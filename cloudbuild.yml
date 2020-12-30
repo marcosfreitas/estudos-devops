@@ -13,11 +13,11 @@ steps:
   args: ['ps']
 
 - id: "Ajuste de permissão da pasta 1"
-  name: "bash"
+  name: "gcr.io/cloud-builders/docker"
   args: ["exec", "-t", "dlh_php_1", "chmod", "-R", "775", "/var/www/html/vendor/"]
 
 - id: "Ajuste de permissão da pasta 2"
-  name: "bash"
+  name: "gcr.io/cloud-builders/docker"
   args: ["exec", "-t", "dlh_php_1", "sudo", "chown", "-R", "$USER:$USER", "/var/www/html/vendor/"]
 
 - id: "Rodando composer"
