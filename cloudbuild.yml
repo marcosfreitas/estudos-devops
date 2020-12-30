@@ -14,11 +14,11 @@ steps:
 
 - id: "Ajuste de permissão da pasta 1"
   name: "gcr.io/cloud-builders/docker"
-  args: ["exec", "-t", "dlh_php_1", "chmod", "-R", "775", "/var/www/html/vendor/"]
+  args: ["exec", "-t", "dlh_php_1", "chmod", "-R", "775", "/var/www/html"]
 
 - id: "Ajuste de permissão da pasta 2"
   name: "gcr.io/cloud-builders/docker"
-  args: ["exec", "-t", "dlh_php_1", "sudo", "chown", "-R", "$USER:$USER", "/var/www/html/vendor/"]
+  args: ["exec", "-t", "dlh_php_1", "sudo", "chown", "-R", "$USER:$USER", "/var/www/html"]
 
 - id: "Rodando composer"
   name: "gcr.io/cloud-builders/docker"
