@@ -4,6 +4,10 @@ steps:
   name: "bash"
   args: ['cp' , '.env.example', '.env']
 
+- id: "Criando pasta host"
+  name: "bash"
+  args: ["mkdir", "-p", "/var/www/html"]
+
 - id: "Ajuste de permissão da pasta 1"
   name: "bash"
   args: ["chmod", "-R", "775", "/var/www/html"]
