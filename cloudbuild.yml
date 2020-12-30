@@ -4,17 +4,13 @@ steps:
   name: "bash"
   args: ['cp' , '.env.example', '.env']
 
-- id: "Criando pasta host"
-  name: "bash"
-  args: ["mkdir", "-p", "/var/www/html"]
-
 - id: "Ajuste de permissão da pasta 1"
   name: "bash"
-  args: ["chmod", "-R", "775", "/var/www/html"]
+  args: ["chmod", "-R", "775", "./www"]
 
 - id: "Ajuste de permissão da pasta 2"
   name: "bash"
-  args: ["chown", "-R", "$USER:$USER", "/var/www/html"]
+  args: ["chown", "-R", "$USER:$USER", "./www"]
 
 - id: "Rodando docker-compose"
   name: "gcr.io/$PROJECT_ID/docker-compose"
