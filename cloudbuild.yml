@@ -1,8 +1,8 @@
 steps:
 
 - id: "Copiando .env"
-  name: "gcr.io/cloud-builders/docker"
-  args: ['exec', '-t', 'app', 'cp' , '.env.example', '.env']
+  name: "bash"
+  args: ['cp' , '.env.example', '.env']
 
 - id: "Rodando docker-compose"
   name: "gcr.io/$PROJECT_ID/docker-compose"
