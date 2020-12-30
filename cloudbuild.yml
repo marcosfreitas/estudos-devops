@@ -9,21 +9,17 @@ steps:
   args: ['-f', 'docker-compose.cloudbuild.yml', 'up', '-d']
 
 - id: "Rodando docker ps"
-  name: "gcr.io/cloud-builders/docker"
+  name: "docker"
   args: ['ps']
 
-- id: "Ajuste de permissão da pasta 1"
-  name: "gcr.io/cloud-builders/docker"
-  args: ["exec", "-t", "dlh_php_1", "/bin/bash", "sudo", "chmod", "-R", "775", "/var/www/html"]
-
-- id: "Ajuste de permissão da pasta 2"
-  name: "gcr.io/cloud-builders/docker"
-  args: ["exec", "-t", "dlh_php_1", "/bin/bash", "sudo", "chown", "-R", "$USER:$USER", "/var/www/html"]
+- id: "Chown in /var/www"
+  name: 'docker'
+  args: [ 'exec','-u','root','-t','app','chown','-R','www-data:www-data','/var/www' ]
 
 - id: "Rodando composer"
-  name: "gcr.io/cloud-builders/docker"
+  name: "docker"
   args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'composer', 'install']
 
 - id: "Rodando key:generate"
-  name: "gcr.io/cloud-builders/docker"
+  name: "docker"
   args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'php' , '/var/www/html/artisan', 'key:generate']
