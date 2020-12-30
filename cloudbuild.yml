@@ -4,6 +4,14 @@ steps:
   name: "bash"
   args: ['cp' , '.env.example', '.env']
 
+- id: "Ajuste de permissão da pasta 1"
+  name: "bash"
+  args: ["chmod", "-R", "775", "/var/www/html"]
+
+- id: "Ajuste de permissão da pasta 2"
+  name: "bash"
+  args: ["chown", "-R", "$USER:$USER", "/var/www/html"]
+
 - id: "Rodando docker-compose"
   name: "gcr.io/$PROJECT_ID/docker-compose"
   args: ['-f', 'docker-compose.cloudbuild.yml', 'up', '-d']
@@ -11,14 +19,6 @@ steps:
 - id: "Rodando docker ps"
   name: "gcr.io/cloud-builders/docker"
   args: ['ps']
-
-- id: "Ajuste de permissão da pasta 1"
-  name: "gcr.io/cloud-builders/docker"
-  args: ["exec", "-t", "dlh_php_1", "chmod", "-R", "775", "/var/www/html"]
-
-- id: "Ajuste de permissão da pasta 2"
-  name: "gcr.io/cloud-builders/docker"
-  args: ["exec", "-t", "dlh_php_1", "sudo", "chown", "-R", "$USER:$USER", "/var/www/html"]
 
 - id: "Rodando composer"
   name: "gcr.io/cloud-builders/docker"
