@@ -5,20 +5,12 @@ steps:
   args: ['cp' , '.env.example', '.env']
 
 - id: "Rodando docker-compose"
-  name: "gcr.io/$PROJECT_ID/docker-compose"
-  args: ['-f', 'docker-compose.cloudbuild.yml', 'up', '-d']
-
-- id: "Rodando docker ps"
-  name: "docker"
-  args: ['ps']
+  name: "docker/compose"
+  args: ['up', '-d']
 
 - id: "Chown in /var/www"
   name: 'docker'
   args: [ 'exec','-u','root','-t','dlh_php_1','chown','-R','www-data:www-data','/var/www' ]
-
-- id: "Verificando existência do arquivo do composer"
-  name: "docker"
-  args: ['exec', '-t', 'dlh_php_1', 'ls', '-s', '/usr/bin/composer']
 
 - id: "Rodando composer"
   name: "docker"
