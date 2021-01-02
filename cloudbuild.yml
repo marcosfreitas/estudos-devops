@@ -18,12 +18,12 @@ steps:
 
 - id: "Verificando existência do arquivo do composer"
   name: "docker"
-  args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'ls', '-s', '/usr/bin/composer']
+  args: ['exec', '-t', 'dlh_php_1', 'ls', '-s', '/usr/bin/composer']
 
 - id: "Rodando composer"
   name: "docker"
-  args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'composer', 'install']
+  args: ['exec', '-t', 'dlh_php_1', 'composer', 'install']
 
 - id: "Rodando key:generate"
   name: "docker"
-  args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'php' , '/var/www/html/artisan', 'key:generate']
+  args: ['exec', '-t', 'dlh_php_1', 'php' , '/var/www/html/artisan', 'key:generate']
