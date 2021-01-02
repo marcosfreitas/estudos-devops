@@ -27,3 +27,11 @@ steps:
 - id: "Rodando key:generate"
   name: "docker"
   args: ['exec', '-t', 'dlh_php_1', 'php' , '/var/www/html/artisan', 'key:generate']
+
+- id: "Rodando migrations"
+  name: "docker"
+  args: ['exec', '-t', 'dlh_php_1', 'php' , '/var/www/html/artisan', 'migrate']
+
+- id: "Rodando php unit"
+  name: "docker"
+  args: ['exec', '-t', 'dlh_php_1', 'php' , '/var/www/html/vendor/bin/phpunit', '-c', '/var/www/html/phpunit.xml']
