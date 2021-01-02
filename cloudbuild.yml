@@ -16,6 +16,10 @@ steps:
   name: 'docker'
   args: [ 'exec','-u','root','-t','dlh_php_1','chown','-R','www-data:www-data','/var/www' ]
 
+- id: "Verificando existência do arquivo do composer"
+  name: "docker"
+  args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'ls', '-s', '/usr/bin/composer']
+
 - id: "Rodando composer"
   name: "docker"
   args: ['exec', '-t', 'dlh_php_1', "/bin/bash", 'composer', 'install']
