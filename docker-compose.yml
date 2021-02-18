@@ -15,4 +15,4 @@ services:
     working_dir: /go/src/app
     volumes:
       - ./src:/go/src/app
-    command: bash -c "ls ."
+    command: ls .
