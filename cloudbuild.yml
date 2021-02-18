@@ -4,17 +4,5 @@ steps:
   name: "docker"
   args: ['build', '.', '--tag', 'gcr.io/$PROJECT_ID/desafio_ci_go:latest']
 
-- id: "Docker compose up"
-  name: "docker/compose"
-  args: ['up', '-d']
-
-- id: "Listando imagens"
-  name: "docker"
-  args: ['images']
-
-- id: "Executando teste unitário"
-  name: "docker"
-  args: ["exec", "-t", "desafio_ci_go", "go", "test"]
-
 images:
   - 'gcr.io/$PROJECT_ID/desafio_ci_go:latest'
