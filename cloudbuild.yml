@@ -17,4 +17,4 @@ steps:
   args: ["exec", "-t", "desafio_ci_go", "go", "test"]
 
 images:
-  - 'gcr.io/$PROJEC_ID/desafio_ci_go:latest'
+  - 'gcr.io/$PROJECT_ID/desafio_ci_go:latest'
