@@ -7,6 +7,6 @@ WORKDIR /go/src/app
 
 COPY ./src .
 
-RUN go build hello.go
+RUN apk add bash; go build hello.go; ls .
 
-CMD ["./hello"]
+CMD ["go","run","hello"]
