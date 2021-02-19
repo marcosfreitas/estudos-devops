@@ -1,7 +1,8 @@
 steps:
 
 - id: "Executando teste unitário"
-  name: "gcr.io/cloud-builders/go"
+  name: "gcr.io/cloud-builders/go:alpine"
+  env: ["GOPATH=."]
   args: ["test","./..."]
 
 - id: "Build de imagem"
