@@ -1,0 +1,13 @@
+steps:
+
+- id: "Executando teste unitário"
+  name: "gcr.io/cloud-builders/go:alpine"
+  env: ["GOPATH=."]
+  args: ["test","./..."]
+
+- id: "Build de imagem"
+  name: "docker"
+  args: ['build', '.', '--tag', 'gcr.io/$PROJECT_ID/desafio_ci_go:latest']
+
+images:
+  - 'gcr.io/$PROJECT_ID/desafio_ci_go:latest'
