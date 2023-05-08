@@ -1,20 +1,17 @@
 # @version 1.0.0
 # Build an Go application with an small image built
 
-FROM golang:1.14-alpine as builder
+FROM golang:1.20-alpine as builder
 
 WORKDIR /go/src/app
 
 COPY ./src .
 
-RUN go build hello.go &&\
-    ls -la
+RUN go mod init teste
+RUN go build math.go && ls -la
 
 FROM scratch as prod
 
 COPY --from=builder /go/src/app .
 
-#RUN apk add bash;
-# go build hello.go; pwd; ls .
-
-CMD ["./hello"]
+CMD ["./math"]
