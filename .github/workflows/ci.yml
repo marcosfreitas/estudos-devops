@@ -36,4 +36,4 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: marcosfreitas/estudos-devops:go-app
+          tags: ${{ github.repository_owner }}/go-app:latest
